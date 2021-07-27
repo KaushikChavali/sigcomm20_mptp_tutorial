@@ -12,7 +12,7 @@ install_mininet() {
     echo '
 # Mininet: allow IP forwarding
 net.ipv4.ip_forward=1
-net.ipv6.conf.all.forwarding=1' | sudo tee -a /etc/sysctl.conf 
+net.ipv6.conf.all.forwarding=1' | sudo tee -a /etc/sysctl.conf
 }
 
 install_clang() {
@@ -94,10 +94,25 @@ install_mptcp() {
     echo "Install MPTCP"
     # Let us rely on APT repo. For more details to build this, go to
     # http://multipath-tcp.org/pmwiki.php/Users/DoItYourself
-    sudo apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 379CE192D401AB61
-    sudo sh -c "echo 'deb https://dl.bintray.com/multipath-tcp/mptcp_deb stable main' > /etc/apt/sources.list.d/mptcp.list"
-    sudo apt-get update
-    sudo apt-get install -y linux-mptcp-4.14 linux-image-4.14.146.mptcp linux-headers-4.14.146.mptcp
+    #sudo apt-key adv --keyserver hkps://keyserver.ubuntu.com:443 --recv-keys 379CE192D401AB61
+    #sudo sh -c "echo 'deb https://dl.bintray.com/multipath-tcp/mptcp_deb stable main' > /etc/apt/sources.list.d/mptcp.list"
+    #sudo apt-get update
+    #sudo apt-get install -y linux-mptcp-4.14 linux-image-4.14.146.mptcp linux-headers-4.14.146.mptcp
+
+    # On May 2021, our APT repository has been suspended because it was hosted on Bintray which is no longer available.
+    # All packages are now available on Github Releases page only.
+    # https://github.com/multipath-tcp/mptcp/releases
+    # Download and install MPTCP packages manually.
+    mkdir mptcp_packages
+    wget -nv -O mptcp_packages/linux-headers https://github.com/multipath-tcp/mptcp/releases/download/v0.95.1/linux-headers-4.19.126.mptcp_20200611235134_amd64.deb
+    sudo dpkg -i mptcp_packages/linux-headers
+    wget -nv -O mptcp_packages/linux-image https://github.com/multipath-tcp/mptcp/releases/download/v0.95.1/linux-image-4.19.126.mptcp_20200611235134_amd64.deb
+    sudo dpkg -i mptcp_packages/linux-image
+    wget -nv -O mptcp_packages/linux-libc https://github.com/multipath-tcp/mptcp/releases/download/v0.95.1/linux-libc-dev_20200611235134_amd64.deb
+    sudo dpkg -i mptcp_packages/linux-libc
+    wget -nv -O mptcp_packages/linux-mptcp https://github.com/multipath-tcp/mptcp/releases/download/v0.95.1/linux-mptcp_v0.95.1_20200611235134_all.deb
+    sudo dpkg -i mptcp_packages/linux-mptcp
+
     # The following runs the MPTCP kernel version 4.14.146 as the default one
     sudo cat /etc/default/grub | sed -e "s/GRUB_DEFAULT=0/GRUB_DEFAULT='Advanced options for Ubuntu>Ubuntu, with Linux 4.14.146.mptcp'/" > tmp_grub
     sudo mv tmp_grub /etc/default/grub

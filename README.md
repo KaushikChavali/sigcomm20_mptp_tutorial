@@ -32,7 +32,7 @@ $ uname -a
 # Linux ubuntu-bionic 4.14.146.mptcp #17 SMP Tue Sep 24 12:55:02 UTC 2019 x86_64 x86_64 x86_64 GNU/Linux
 ```
 
-> Starting from now, we assume that otherwise stated, all commands are run inside the vagrant box. 
+> Starting from now, we assume that otherwise stated, all commands are run inside the vagrant box.
 
 The `tutorial_files` folder is shared with the vagrant box, such as the VM can access to this folder containing the experiment files through the `/tutorial` folder.
 The network experiments that we will perform in the remaining of this tutorial rely on [minitopo](https://github.com/qdeconinck/minitopo/tree/minitopo2) which itself is a wrapper of [Mininet](http://mininet.org/).
@@ -40,6 +40,8 @@ For the sake of simplicity, we will rely on a bash alias called `mprun` (which i
 Typically, you just need to go to the right folder and run `mprun -t topo_file -x xp_file` where `topo_file` is the file containing the description of a network scenario and `xp_file` the one with the description of the experiment to perform.
 If you are interested in reproducing the setup in another environment, or if you want to understand the provided "black-box", feel free to have a look at the `prepare_vm.sh` provision script.
 
+> `Note` that logging minitopo version at /home/vagrant/minitopo/runner.py returns with a fatal error.
+> `Fix` Comment line 28. https://github.com/qdeconinck/minitopo/blob/20dd40d50c75d7877218ef5816646f44e9ef4333/runner.py#L28
 
 ## Organization
 
@@ -101,7 +103,7 @@ The two most basic packets schedulers are the following.
 The packet scheduler is also responsible of the content of the data to be sent.
 Yet, due to implementation constraints, most of the proposed packet schedulers in the litterature focus on the first data to be sent (i.e., they only select the path where to send the next data).
 With such strategy, the scheduler has only impactful choices when several network paths are available for data transmission.
-Notice that cleverer packet schedulers, such as [BLEST](https://ieeexplore.ieee.org/abstract/document/7497206) or [ECF](https://dl.acm.org/doi/abs/10.1145/3143361.3143376) can delay the transmission of data on slow paths to achieve lower transfer times. 
+Notice that cleverer packet schedulers, such as [BLEST](https://ieeexplore.ieee.org/abstract/document/7497206) or [ECF](https://dl.acm.org/doi/abs/10.1145/3143361.3143376) can delay the transmission of data on slow paths to achieve lower transfer times.
 
 
 ### Case 1: request/response traffic from client perspective
@@ -132,7 +134,7 @@ Since the round-robin scheduler spreads the load over the slowest network path, 
 
 > Note that the multipath algorithms, including the packet scheduler, are host specific.
 > This means that the client and the server can use different algorithms over a single connection.
-> However, the Multipath TCP implementation in the Linux kernel does not apply `sysctl`s per namespace, making this experimentation not possible using Mininet. 
+> However, the Multipath TCP implementation in the Linux kernel does not apply `sysctl`s per namespace, making this experimentation not possible using Mininet.
 
 
 ### Case 2: HTTP traffic
@@ -253,12 +255,12 @@ This situation mimics a mobile device moving out of reachability of a wireless n
 Two versions of the topology are present in `/tutorial/04_backup`: `topo` (where both paths are marked as "normal") and `topo_bk` (where the 30 ms RTT path is marked as a backup one).
 The experiment uses the `default` scheduler.
 
-First run the experiment `reqres_rtt` with the topology `topo`. 
+First run the experiment `reqres_rtt` with the topology `topo`.
 ```bash
 $ mprun -t topo -x reqres_rtt
 ```
 - Have a look at the experienced application delay in `msg_client.log`. Can you explain your results?
-  
+
 Now consider the same experiment but with the topology `topo_bk`.
 ```bash
 $ mprun -t topo_bk -x reqres_rtt
@@ -299,7 +301,7 @@ $ mprun -t topo_cong -x iperf_scenario_olia_1sf
 ```
 Take some time to look at the results (the Multipath TCP Iperf flow result file is `iperf.log0` and TCP ones are respectively `iperf.log1` and `iperf.log2`).
 You should observe that when TCP flows run, they obtain half of the bandwidth capacity of the bottleneck.
-The rate that the Multipath TCP flow should obtain should 
+The rate that the Multipath TCP flow should obtain should
 * start to about 40 Mbps,
 * then decrease to 30 Mbps after 10 seconds (competition with flow 1 on upper bottleneck),
 * decrease again to 20 Mbps after 20 seconds (competing with both flows on both bottlenecks),
@@ -399,7 +401,7 @@ A little later in the file, you should notice that the server starts sending the
 ```
 In the server to client flow, the Destination Connection ID used is `ee522f732adea40d`.
 Notice also the `ACK` frame acknowledging the client's packets from `0` to `1` included.
-You can then flow to the end of the file 
+You can then flow to the end of the file
 At the end of the file (the penultimate line), you should have the time of the GET transfer, which should be about 4.5 s.
 
 Then, you can have a look at the multipath version of QUIC.
