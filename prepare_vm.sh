@@ -114,7 +114,7 @@ install_mptcp() {
     sudo dpkg -i mptcp_packages/linux-mptcp
 
     # The following runs the MPTCP kernel version 4.14.146 as the default one
-    sudo cat /etc/default/grub | sed -e "s/GRUB_DEFAULT=0/GRUB_DEFAULT='Advanced options for Ubuntu>Ubuntu, with Linux 4.14.146.mptcp'/" > tmp_grub
+    sudo cat /etc/default/grub | sed -e "s/GRUB_DEFAULT=0/GRUB_DEFAULT='Advanced options for Ubuntu>Ubuntu, with Linux 4.19.126.mptcp'/" > tmp_grub
     sudo mv tmp_grub /etc/default/grub
     sudo update-grub
 
